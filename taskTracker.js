@@ -20,12 +20,24 @@ function saveTasks(tasks) {
     fs.writeFileSync(tasksFile, JSON.stringify(tasks, null, 2));
 }
 
+// Function to generate a unique ID for each task
+function generateId(tasks) {
+    return tasks.length > 0 ? tasks[tasks.length - 1].id + 1 : 1;
+}
+
 // Function to add a new task
-function addTask(taskName) {
+function addTask(description) {
     const tasks = loadTasks();
-    tasks.push({ task: taskName, status: "To Do" });
+    const newTask = {
+        id: generateId(tasks),
+        description: description,
+        status: "To Do",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
+    tasks.push(newTask);
     saveTasks(tasks);
-    console.log(`Task "${taskName}" added!`);
+    console.log(`Task "${description}" added with ID ${newTask.id}!`);
 }
 
 // Function to view all tasks with optional filter
@@ -40,32 +52,37 @@ function viewTasks(filter = null) {
         ? tasks.filter(task => task.status === filter)
         : tasks;
 
-    filteredTasks.forEach((task, index) => {
-        console.log(`${index + 1}. ${task.task} - ${task.status}`);
+    filteredTasks.forEach(task => {
+        console.log(`ID: ${task.id}, Description: ${task.description}, Status: ${task.status}, Created At: ${task.createdAt}, Updated At: ${task.updatedAt}`);
     });
 }
 
 // Function to update task status
-function updateTask(taskNumber, newStatus) {
+function updateTask(taskId, newStatus) {
     const tasks = loadTasks();
-    if (taskNumber > 0 && taskNumber <= tasks.length) {
-        tasks[taskNumber - 1].status = newStatus;
+    const taskIndex = tasks.findIndex(task => task.id === taskId);
+    
+    if (taskIndex !== -1) {
+        tasks[taskIndex].status = newStatus;
+        tasks[taskIndex].updatedAt = new Date().toISOString();
         saveTasks(tasks);
-        console.log(`Task ${taskNumber} updated to "${newStatus}"`);
+        console.log(`Task ${taskId} updated to "${newStatus}"`);
     } else {
-        console.log("Invalid task number.");
+        console.log("Task ID not found.");
     }
 }
 
 // Function to delete a task
-function deleteTask(taskNumber) {
+function deleteTask(taskId) {
     const tasks = loadTasks();
-    if (taskNumber > 0 && taskNumber <= tasks.length) {
-        const removedTask = tasks.splice(taskNumber - 1, 1);
+    const taskIndex = tasks.findIndex(task => task.id === taskId);
+    
+    if (taskIndex !== -1) {
+        const removedTask = tasks.splice(taskIndex, 1);
         saveTasks(tasks);
-        console.log(`Task "${removedTask[0].task}" removed!`);
+        console.log(`Task "${removedTask[0].description}" with ID ${taskId} removed!`);
     } else {
-        console.log("Invalid task number.");
+        console.log("Task ID not found.");
     }
 }
 

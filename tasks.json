@@ -1,6 +1,9 @@
 [
   {
-    "task": "Buy groceries",
-    "status": "Done"
+    "id": 1,
+    "description": "Buy groceries",
+    "status": "To Do",
+    "createdAt": "2024-11-01T10:36:48.116Z",
+    "updatedAt": "2024-11-01T10:36:48.118Z"
   }
 ]
